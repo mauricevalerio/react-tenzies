@@ -6,8 +6,25 @@ body {
   margin: 0;
   font-family: 'Karla';
   background: #0B2434;
+  height: 100vh;
 }
 
-#root {
-  margin: auto;
+@media (width >= 480px) {
+  body {
+    padding: 0 10%;
+  }
+}
+
+@media (width >= 768px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media (width >= 1024px) {
+  body {
+    padding: 0 30%;
+  }
 }

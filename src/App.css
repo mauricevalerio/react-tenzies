@@ -1,4 +1,5 @@
 main {
+  position: relative;
   background: #F5F5F5;
   display: flex;
   flex-direction: column;
@@ -30,10 +31,12 @@ main {
   cursor: pointer;
 }
 
+.show-leaderboard-btn:focus,
 .roll-dice-btn:focus {
   outline: none;
 }
 
+.show-leaderboard-btn:active,
 .roll-dice-btn:active {
   box-shadow: inset 5px 5px 10px -3px rgba(0, 0, 0, 0.7);
 }
@@ -60,6 +63,16 @@ main {
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+.show-leaderboard-btn {
+  border: none;
+  background: #59E391;
+  font-family: inherit;
+  font-size: 1.25rem;
+  border-radius: 10px;
+  padding: 0.5em;
+  cursor: pointer;
 }
 
 @media (width >= 640px) {

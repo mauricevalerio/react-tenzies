@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import Die from './Die'
+import Leaderboard from './Leaderboard'
 import { nanoid } from 'nanoid'
 import Confetti from 'react-confetti'
 import { useStopwatch } from 'react-timer-hook'
@@ -8,14 +9,46 @@ import { useStopwatch } from 'react-timer-hook'
 function App() {
   const { seconds, minutes, start, pause, reset } = useStopwatch({autoStart: true})
 
-  const [dice, setDice] = useState(allNewDice())
-  const [tenzies, setTenzies] = useState(false)
-  const [numRolls, setNumRolls] = useState(0)
+  const [dice, setDice] = useState(allNewDice()) //tracks dice
+  const [tenzies, setTenzies] = useState(false) //tracks if player already won
+  const [numRolls, setNumRolls] = useState(0) //tracks number of rolls
+  const [leaderboard, setLeaderboard] = useState(() => JSON.parse(localStorage.getItem("leaderboard")) || [])
+  const [toggleLeaderboardModal, setToggleLeaderboardModal] = useState(false) //tracks if leaderboard modal is open
+
+  function sortNumRolls() {
+    setLeaderboard(prevLeaderboard => prevLeaderboard.sort((a, b) => a.numRolls - b.numRolls))
+  }
+
+  function sortTime() {
+    setLeaderboard(prevLeaderboard => prevLeaderboard.sort((a, b) => a.totalTimeSeconds - b.totalTimeSeconds))
+  }
+
+  function updateLeaderboard() {
+    const leaderboardItem = {
+      id: nanoid(),
+      numRolls: numRolls,
+      minutes: minutes,
+      seconds: seconds,
+      totalTimeSeconds: minutes * 60 + seconds
+      }
+    setLeaderboard(prevLeaderboard => [
+      ...prevLeaderboard,
+      leaderboardItem
+      ]
+    )
+    sortTime()
+  }
+
+  useEffect(() => {
+    localStorage.setItem("leaderboard",JSON.stringify(leaderboard))
+  }, [leaderboard])
 
   useEffect(() => {
     if (dice.every((die, i, array) => die.isHeld && die.value === array[0].value)) {
       setTenzies(true)
       pause()
+
+      updateLeaderboard()
     }
   }, [dice])
 
@@ -62,12 +95,23 @@ function App() {
     />
   })
 
+  function handleToggleLeaderBoardModal() {
+    setToggleLeaderboardModal(prevState => !prevState)
+  }
+
   return (
   <main>
     {tenzies && <Confetti />}
+    <Leaderboard
+    leaderboard={leaderboard}
+    toggleLeaderboardModal={toggleLeaderboardModal}
+    handleToggleLeaderBoardModal={handleToggleLeaderBoardModal}
+    sortNumRolls={sortNumRolls}
+    sortTime={sortTime}
+    />
     <div className="details">
       <h1 className="title">Tenzies</h1>
-      <div></div>
+      <button onClick={handleToggleLeaderBoardModal} className='show-leaderboard-btn'>Leaderboards</button>
       <p className="instructions">Roll until all dice are the same. Click each die to freeze it at its current value between rolls.</p>
       <div className="details-inner">
         <p className="number-of-rolls">Number of Rolls: {numRolls}</p>

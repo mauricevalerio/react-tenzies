@@ -1,0 +1,61 @@
+.leaderboard-container {
+    padding: 1em;
+    position: fixed;
+    background: #f5f5f5;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 80vw;
+    height: 70vh;
+    border: 1px solid #67595e;
+    border-radius: 5px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-200%);
+    transition: opacity 1s, transform 1s;
+    overflow-y: scroll;
+}
+
+h2 {
+    text-align: center;
+}
+
+.leaderboard-container.open {
+    /* shows modal when class "open" is added and adds effect */
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.leaderboard-close-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.leaderboard-header,
+.leaderboard-item {
+    display: grid;
+    grid-template: 1fr / repeat(3, 1fr);
+    border-bottom: 1px solid gray;
+}
+
+p {
+    justify-self: center;
+    align-self: center;
+    text-align: center;
+}
+
+.leaderboard-num-rolls,
+.leaderboard-time {
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid gray;
+    padding: 1em;
+}

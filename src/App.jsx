@@ -7,50 +7,50 @@ import Confetti from 'react-confetti'
 import { useStopwatch } from 'react-timer-hook'
 
 function App() {
-  const { seconds, minutes, start, pause, reset } = useStopwatch({autoStart: true})
+  const { seconds, minutes, isRunning, start, pause, reset } = useStopwatch({autoStart: true})
 
   const [dice, setDice] = useState(allNewDice()) //tracks dice
   const [tenzies, setTenzies] = useState(false) //tracks if player already won
   const [numRolls, setNumRolls] = useState(0) //tracks number of rolls
-  const [leaderboard, setLeaderboard] = useState(() => JSON.parse(localStorage.getItem("leaderboard")) || [])
+  const [randomUsername, setRandomUsername] = useState(() => 'Guest' + Math.floor(Math.random() * 10000)) //generates random username
   const [toggleLeaderboardModal, setToggleLeaderboardModal] = useState(false) //tracks if leaderboard modal is open
+  const [sortLeaderboard, setSortLeaderboard] = useState(false) //placeholder to re-render leaderboards in case sort happens
+  const [windowDimension, setWindowDimension] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
 
-  function sortNumRolls() {
-    setLeaderboard(prevLeaderboard => prevLeaderboard.sort((a, b) => a.numRolls - b.numRolls))
-  }
-
-  function sortTime() {
-    setLeaderboard(prevLeaderboard => prevLeaderboard.sort((a, b) => a.totalTimeSeconds - b.totalTimeSeconds))
-  }
-
-  function updateLeaderboard() {
-    const leaderboardItem = {
-      id: nanoid(),
-      numRolls: numRolls,
-      minutes: minutes,
-      seconds: seconds,
-      totalTimeSeconds: minutes * 60 + seconds
-      }
-    setLeaderboard(prevLeaderboard => [
-      ...prevLeaderboard,
-      leaderboardItem
-      ]
-    )
-    sortTime()
+  function detectDimension() {
+    setWindowDimension({
+      width: window.innerWidth,
+      height: window.innerHeight
+    })
   }
 
   useEffect(() => {
-    localStorage.setItem("leaderboard",JSON.stringify(leaderboard))
-  }, [leaderboard])
+      window.addEventListener("resize", detectDimension)
+      return () => {
+        window.removeEventListener("resize", detectDimension)
+      }
+  }, [windowDimension])
 
   useEffect(() => {
     if (dice.every((die, i, array) => die.isHeld && die.value === array[0].value)) {
       setTenzies(true)
       pause()
-
-      updateLeaderboard()
     }
   }, [dice])
+
+  //game has not ended and leaderboard is open
+  //game has ended and leaderboard is opened and closed
+  //game has ended and isRunning is false
+  useEffect(() => {
+    if(toggleLeaderboardModal || tenzies && !isRunning) {
+      pause()
+    } else {
+      start()
+    }
+  },[toggleLeaderboardModal])
 
   function generateNewDie() {
     return {
@@ -72,6 +72,7 @@ function App() {
     if (tenzies) {
       setDice(allNewDice())
       setTenzies(false)
+      setRandomUsername('Guest' + Math.floor(Math.random() * 10000))
       setNumRolls(0)
       reset()
     } else {
@@ -92,38 +93,76 @@ function App() {
       value={die.value}
       isHeld={die.isHeld}
       handleDieHeld={handleDieHeld}
+      tenzies={tenzies}
+      isRunning={isRunning}
+      toggleLeaderboardModal={toggleLeaderboardModal}
     />
   })
 
-  function handleToggleLeaderBoardModal() {
-    setToggleLeaderboardModal(prevState => !prevState)
+  function handleToggleLeaderboardModal() {
+    setToggleLeaderboardModal(prevModalState => !prevModalState)    
   }
 
   return (
-  <main>
-    {tenzies && <Confetti />}
-    <Leaderboard
-    leaderboard={leaderboard}
-    toggleLeaderboardModal={toggleLeaderboardModal}
-    handleToggleLeaderBoardModal={handleToggleLeaderBoardModal}
-    sortNumRolls={sortNumRolls}
-    sortTime={sortTime}
-    />
-    <div className="details">
-      <h1 className="title">Tenzies</h1>
-      <button onClick={handleToggleLeaderBoardModal} className='show-leaderboard-btn'>Leaderboards</button>
-      <p className="instructions">Roll until all dice are the same. Click each die to freeze it at its current value between rolls.</p>
-      <div className="details-inner">
-        <p className="number-of-rolls">Number of Rolls: {numRolls}</p>
-        <p className="timer">Timer: {`${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2, "0")}`}</p>
-      </div>
-    </div>
-    <div className="dice-container">
-      {dieElements}
-    </div>
-    <button className='roll-dice-btn' onClick={handleRollClick}>{tenzies ? "New Game" : "Roll"}</button>
-  </main>
+  <>
+    {tenzies && <Confetti width={windowDimension.width} height={windowDimension.height}/>}
 
+    <main>
+
+      <Leaderboard
+      tenzies={tenzies}
+      username={randomUsername}
+      numRolls={numRolls}
+      minutes={minutes}
+      seconds={seconds}
+      toggleLeaderboardModal={toggleLeaderboardModal}
+      handleToggleLeaderboardModal={handleToggleLeaderboardModal}
+      setSortLeaderboard={setSortLeaderboard}
+      />
+
+      <div className="details">
+
+        <h1 className="title">🎲Tenzies🎲</h1>
+
+        <div className="username-and-leaderboards">
+          <button onClick={handleToggleLeaderboardModal} className='btn btn-green'>Leaderboards</button>
+          <h4 className="username">Welcome! <span>{randomUsername}</span></h4>
+        </div>
+
+        <p className="instructions">Roll until all dice are the same. Click each die to freeze it at its current value between rolls.</p>
+        
+        <div className="numrolls-and-timer">
+          <p className="number-of-rolls">Number of Rolls: {numRolls}</p>
+          <p className="timer">Timer: {`${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2, "0")}`}</p>
+        </div>
+
+      </div>
+
+      <div className="dice-container">
+
+        {dieElements}
+
+      </div>
+
+      <div className="btn-container">
+
+        <button 
+          className='btn btn-blue roll-dice-btn' 
+          disabled={tenzies ? false : !isRunning || toggleLeaderboardModal} //if game is paused disable roll button, if game has ended new game button should still be enabled
+          onClick={handleRollClick}>
+          {tenzies ? "New Game" : "Roll"}
+        </button>
+
+        <button 
+          className='btn btn-blue pause-btn' 
+          disabled={tenzies || toggleLeaderboardModal} 
+          onClick={isRunning ? pause : start}>
+          {isRunning ? "Pause" : "Resume"}
+        </button>
+      </div>
+
+    </main>
+  </>
   )
 }
 

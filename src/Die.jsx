@@ -12,7 +12,13 @@ function Die(props) {
     }
     return (
         <div 
-        className={`die-face ${props.isHeld ? "held-die" : ""}`} 
+        className={`die-face ${props.isHeld ? "held-die" : ""} 
+        ${props.tenzies || !props.isRunning || props.toggleLeaderboardModal ? "disable-die-click-event" : ""}
+        ${props.isHeld ? "" : "animate-die"}
+        `}
+        //if game has ended, game paused, or leaderboard modal is open disable click events
+
+        //if game is paused or game ended, disable click events
         onClick={() => props.handleDieHeld(props.id)}>
             {generateDot()}
         </div>
@@ -20,3 +26,5 @@ function Die(props) {
 }
 
 export default Die
+
+//props.isHeld ? dont run animation : run animation

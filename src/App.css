@@ -5,9 +5,25 @@ main {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  gap: 1em;
-  padding: 1em;
+  padding: 0.75em;
   height: 100vh;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+}
+
+.username-and-leaderboards,
+.numrolls-and-timer,
+.instructions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 1.125rem;
 }
 
 .dice-container {
@@ -18,62 +34,66 @@ main {
   place-items: center;
 }
 
-.roll-dice-btn {
-  font-family: inherit;
-  background: #5035FF;
-  box-shadow: 0px 3.2px 7.68px rgba(0, 0, 0, 0.18);
-  border-radius: 3.81277px;
-  color: #FFF;
-  width: 200px;
-  height: 60px;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.show-leaderboard-btn:focus,
-.roll-dice-btn:focus {
-  outline: none;
-}
-
-.show-leaderboard-btn:active,
-.roll-dice-btn:active {
-  box-shadow: inset 5px 5px 10px -3px rgba(0, 0, 0, 0.7);
-}
-
-.details {
+.btn-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5em;
+  width: 100%;
+  justify-content: space-between;
 }
 
-.details > h1 {
+
+/* TYPOGRAPHY */
+
+.title,
+.username {
   margin: 0;
   font-weight: 700;
 }
 
+.username > span {
+  background: #59E391;
+  padding: 0.5em;
+  border-radius: 10px;
+}
+
 .details p {
   margin: 0;
-  font-size: 1.125rem;
-  text-align: center;
 }
 
-.details-inner {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.show-leaderboard-btn {
+/* BUTTONS */
+.btn {
   border: none;
-  background: #59E391;
   font-family: inherit;
-  font-size: 1.25rem;
-  border-radius: 10px;
+  border-radius: 3.81277px;
+  font-size: 1.125rem;
   padding: 0.5em;
   cursor: pointer;
+  box-shadow: 0px 3.2px 7.68px rgba(0, 0, 0, 0.18);
 }
+
+.btn-green {
+  background: #59E391;
+}
+
+.btn-blue {
+  width: 150px;
+  height: 50px;
+  background: #5035FF;
+  color: #FFF;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.btn:active {
+  box-shadow: inset 5px 5px 10px -3px rgba(0, 0, 0, 0.7);
+}
+
+button:disabled {
+  background: #dddddd;
+}
+
+/* MEDIA QUERIES */
 
 @media (width >= 640px) {
   main {
@@ -86,9 +106,12 @@ main {
     grid-gap: 20px;
     place-items: center;
   }
-  .details > h1 {
+  .title {
     font-size: 2.5rem;
   }
+  .btn,
+  .instructions,
+  .username, 
   .details p {
     font-size: 1.25rem;
   }
@@ -96,23 +119,23 @@ main {
 
 @media (width >= 768px) {
   main {
-    max-height: 700px;
+    max-height: 650px;
   }
-  .details > h1 {
+  .title {
     font-size: 2.75rem;
   }
+  .btn,
+  .instructions,
+  .username, 
   .details p {
     font-size: 1.5rem;
   }
-  .roll-dice-btn {
-    width: 300px;
-    height: 80px;
-    font-size: 1.75rem;
+  .btn-blue {
+    width: 200px;
+    height: 60px;
   }
-  .details {
-    gap: 1em;
-  }
-  .details-inner {
+  .username-and-leaderboards,
+  .numrolls-and-timer {
     justify-content: space-around;
   }
 }
